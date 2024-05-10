@@ -1,8 +1,9 @@
 package client.view;
 
+import server.model.Constants;
+
 public class BoardView {
     private char[][] board = new char[8][8];
-    private char[] arrayOfLetters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
 
     public BoardView(char[][] board) {
         this.board = board;
@@ -16,7 +17,7 @@ public class BoardView {
         }
         returnedBoard.append("\n");
         for (int i = 0; i < 8; i++) {
-            returnedBoard.append(arrayOfLetters[i]).append(" ").append(" | ");
+            returnedBoard.append(Constants.arrayOfLetters[i]).append(" ").append(" | ");
             for (int j = 0; j < 8; j++) {
                 returnedBoard.append(this.board[i][j]);
                 returnedBoard.append(" | ");
