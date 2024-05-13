@@ -2,6 +2,7 @@ package server.model;
 
 public class Constants {
     public static final char[] arrayOfLetters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+    public static final int[][] listOfMoves = {{1,1},{1,-1},{-1,1},{-1,-1}};
 
     public static int findCharInArray(char[] array, char target) {
         for (int i = 0; i < array.length; i++) {

@@ -45,7 +45,7 @@ public class Board {
     static public int[] convertMove(String move) {
         move = move.toUpperCase();
         int x = Constants.findCharInArray(Constants.arrayOfLetters, move.charAt(0));
-        int y = Character.getNumericValue(move.charAt(1));
+        int y = Character.getNumericValue(move.charAt(1)) - 1;
 
         return new int[]{x, y};
 
@@ -67,7 +67,12 @@ public class Board {
     }
 
     static public boolean isSelectValid(int[] coordinates, char[][] boardGrid, char playerPawn) {
-        return boardGrid[coordinates[0]][coordinates[1]] == playerPawn;
+        if (boardGrid[coordinates[0]][coordinates[1]] != playerPawn) return false;
+        for (int[] move : Constants.listOfMoves) {
+            int[] moveCoordinates = {coordinates[0] + move[0], coordinates[1] + move[1]};
+            if (isMoveValid(moveCoordinates, coordinates, boardGrid, playerPawn)) return true;
+        }
+        return false;
     }
 
     static public boolean isMoveValid(int[] moveCoordinates, int[] selectCoordinates, char[][] boardGrid, char playerPawn) {

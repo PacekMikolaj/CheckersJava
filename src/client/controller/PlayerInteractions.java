@@ -32,7 +32,7 @@ public class PlayerInteractions {
             if(Board.validateInput(input)) {
                 moveCoordinates = Board.convertMove(input);
 
-                if(Board.isMoveValid(selectCoordinates, moveCoordinates, board.boardGrid, 'o')){
+                if(Board.isMoveValid(moveCoordinates,selectCoordinates, board.boardGrid, 'o')){
                     break;
                 }
             }
