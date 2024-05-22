@@ -76,18 +76,17 @@ public class Board {
     }
 
     static public boolean isMoveValid(int[] moveCoordinates, int[] selectCoordinates, char[][] boardGrid, char playerPawn) {
-        int[] moveDirection = new int[]{
+        int[] moveDirections = new int[]{
                 (moveCoordinates[0] - selectCoordinates[0]),
                 (moveCoordinates[1] - selectCoordinates[1])
         };
-
-        if (Math.abs(moveDirection[0]) != 1 || Math.abs(moveDirection[1]) != 1) return false;
+        if(!checkIfInBoardDimentions(moveDirections)) return false;
+        if (Math.abs(moveDirections[0]) != 1 || Math.abs(moveDirections[1]) != 1) return false;
         if (boardGrid[moveCoordinates[0]][moveCoordinates[1]] == playerPawn) return false;
-
         if (boardGrid[moveCoordinates[0]][moveCoordinates[1]] != ' ') {
             int[] newCoordinates = new int[]{
-                    (moveCoordinates[0] + moveDirection[0]),
-                    (moveCoordinates[1] + moveDirection[1])
+                    (moveCoordinates[0] + moveDirections[0]),
+                    (moveCoordinates[1] + moveDirections[1])
             };
 
             if (checkIfInBoardDimentions(newCoordinates)) return false;
