@@ -1,8 +1,10 @@
 package server.controller;
 
+import client.view.BoardView;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import server.model.Board;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -11,10 +13,12 @@ import java.util.Map;
 
 public class Server extends WebSocketServer {
 
+    private Board board = new Board();
+    private BoardView boardView = new BoardView(board.boardGrid);
+
     public static final int SERVER_PORT = 8080;
 
-    private static Map<String, String> map = new HashMap<>();
-    private int activeConnections = 0;
+    private static Map<String, Object[]> players = new HashMap<>();
 
     public Server() {
         super(new InetSocketAddress(SERVER_PORT));
@@ -27,11 +31,11 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
-        if (activeConnections < 2) {
+        if (players.size() < 2) {
             var resource = webSocket.getResourceDescriptor();
             String name = resource.split("=")[1];
-            map.put(webSocket.getRemoteSocketAddress().toString(), name);
-            activeConnections++; // Increment the counter when a new connection is opened
+            players.put(webSocket.getRemoteSocketAddress().toString(), new Object[]{players.isEmpty() ? 'o' : 'x'});
+
             System.out.println("Connection opened: " + webSocket.getRemoteSocketAddress());
             broadcastAllButSender(webSocket, "%s has joined the chat %s.".formatted(name, webSocket.getRemoteSocketAddress().toString()));
         } else {
@@ -39,24 +43,30 @@ public class Server extends WebSocketServer {
             webSocket.send("Connection rejected. Session already has 2 players.");
             webSocket.close(); // Close the connection if there are already two active connections
         }
-            broadcast("Connected users: %d".formatted(activeConnections));
+
+        if(players.size() == 2) {
+            System.out.println(players.get(webSocket.getRemoteSocketAddress()));
+            broadcast("Welcome to Checkers.");
+            broadcast(boardView.toString());
+            System.out.println(players.toString());
+        }
     }
 
     @Override
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
-        activeConnections--;
         System.out.println("Connection closed: " + webSocket.getRemoteSocketAddress());
 
     }
 
     @Override
     public void onMessage(WebSocket webSocket, String s) {
-        if (activeConnections < 2) {
+//        if (activeConnections < 2) {
             webSocket.send("Waiting for another user to connect...");
-        } else {
-            String chatName = map.get(webSocket.getRemoteSocketAddress().toString());
-            broadcastAllButSender(webSocket, "%s: %s".formatted(chatName, s));
-        }
+//        } else {
+
+//            String chatName = players.get(webSocket.getRemoteSocketAddress().toString())[0];
+//            broadcastAllButSender(webSocket, "%s: %s".formatted(chatName, s));
+//        }
 
     }
 
