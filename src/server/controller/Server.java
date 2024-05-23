@@ -1,5 +1,6 @@
 package server.controller;
 
+import client.controller.PlayerInteractions;
 import client.view.BoardView;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -10,11 +11,16 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class Server extends WebSocketServer {
 
     private Board board = new Board();
     private BoardView boardView = new BoardView(board.boardGrid);
+    public String playerTurn = "";
+
+    private int[] selectedCoordinates = {};
+    private int[] moveCoordinates;
 
     public static final int SERVER_PORT = 8080;
 
@@ -34,7 +40,8 @@ public class Server extends WebSocketServer {
         if (players.size() < 2) {
             var resource = webSocket.getResourceDescriptor();
             String name = resource.split("=")[1];
-            players.put(webSocket.getRemoteSocketAddress().toString(), new Object[]{players.isEmpty() ? 'o' : 'x'});
+            playerTurn = webSocket.getRemoteSocketAddress().toString();
+            players.put(webSocket.getRemoteSocketAddress().toString(), new Object[]{name, players.isEmpty() ? 'o' : 'x'});
 
             System.out.println("Connection opened: " + webSocket.getRemoteSocketAddress());
             broadcastAllButSender(webSocket, "%s has joined the chat %s.".formatted(name, webSocket.getRemoteSocketAddress().toString()));
@@ -44,7 +51,7 @@ public class Server extends WebSocketServer {
             webSocket.close(); // Close the connection if there are already two active connections
         }
 
-        if(players.size() == 2) {
+        if (players.size() == 2) {
             System.out.println(players.get(webSocket.getRemoteSocketAddress()));
             broadcast("Welcome to Checkers.");
             broadcast(boardView.toString());
@@ -59,9 +66,26 @@ public class Server extends WebSocketServer {
     }
 
     @Override
-    public void onMessage(WebSocket webSocket, String s) {
-//        if (activeConnections < 2) {
+    public void onMessage(WebSocket webSocket, String move) {
+
+        Consumer<String> sendMessage = (message) -> webSocket.send(message);
+
+        if (players.size() < 2) {
             webSocket.send("Waiting for another user to connect...");
+        } else {
+
+            if (!playerTurn.equals(webSocket.getRemoteSocketAddress().toString())) {
+                System.out.println(move);
+                if (selectedCoordinates.length == 0) {
+                    selectedCoordinates = PlayerInteractions.selectPawn(board, (char) players.get(webSocket.getRemoteSocketAddress().toString())[1], move, sendMessage);
+                } else {
+                    moveCoordinates = PlayerInteractions.selectMove(board, (char) players.get(webSocket.getRemoteSocketAddress().toString())[1], selectedCoordinates, move, sendMessage);
+                }
+            } else {
+                webSocket.send("Wait for your turn :)");
+            }
+        }
+
 //        } else {
 
 //            String chatName = players.get(webSocket.getRemoteSocketAddress().toString())[0];

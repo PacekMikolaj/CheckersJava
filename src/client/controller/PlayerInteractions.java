@@ -2,47 +2,42 @@ package client.controller;
 
 import server.model.Board;
 
-import java.util.Scanner;
+import java.util.function.Consumer;
 
 public class PlayerInteractions {
 
-    public static int[][] makeMove (Board board, char playerPawn) {
-        int[] moveCoordinates;
+    public static int[] selectPawn(Board board, char playerPawn, String input, Consumer<String> sendMessage) {
         int[] selectCoordinates;
-        Scanner scanner = new Scanner(System.in);
-        while(true) {
-        System.out.println("Which pawn to move?");
-        String input = scanner.nextLine();
+
         System.out.println("You entered: " + input);
-        if(Board.validateInput(input)) {
-
-            selectCoordinates = Board.convertMove(input);
-            if(Board.isSelectValid(selectCoordinates,board.boardGrid,'o')){
-            break;
-            }
-
+        if (!Board.validateInput(input)) {
+            sendMessage.accept("Invalid input.");
+            return new int[]{};
         }
-        System.out.println("Wrong input. Try again.");
+        selectCoordinates = Board.convertMove(input);
+        if (!Board.isSelectValid(selectCoordinates, board.boardGrid, playerPawn)) {
+            sendMessage.accept("Invalid input.");
+            return new int[]{};
         }
+        return selectCoordinates;
+    }
 
-        while(true) {
-            System.out.println("Where to move pawn?");
-            String input = scanner.nextLine();
-            System.out.println("You entered: " + input);
-            if(Board.validateInput(input)) {
-                moveCoordinates = Board.convertMove(input);
+    public static int[] selectMove(Board board, char playerPawn, int[] selectCoordinates, String input, Consumer<String> sendMessage) {
+        int[] moveCoordinates;
 
-                if(Board.isMoveValid(moveCoordinates,selectCoordinates, board.boardGrid, 'o')){
-                    break;
-                }
-            }
-            System.out.println("Wrong input. Try again.");
+        sendMessage.accept("Where to move pawn?");
+
+        System.out.println("You entered: " + input);
+        if (!Board.validateInput(input)) {
+            sendMessage.accept("Invalid input...");
+            return new int[]{};
         }
+        moveCoordinates = Board.convertMove(input);
 
-        scanner.close();
-
-
-
-        return new int[][]{selectCoordinates,moveCoordinates};
+        if (!Board.isMoveValid(moveCoordinates, selectCoordinates, board.boardGrid, 'o')) {
+            sendMessage.accept("Invalid input...");
+            return new int[]{};
+        }
+        return moveCoordinates;
     }
 }
