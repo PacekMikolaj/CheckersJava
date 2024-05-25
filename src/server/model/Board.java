@@ -1,17 +1,19 @@
 package server.model;
 
-import java.util.Arrays;
-
 public class Board {
     public char[][] boardGrid = new char[8][8];
     public static final char[] pawns = new char[]{'o', 'x'};
+
+    public static char getOponnentsPawn(char pawn) {
+        return pawn == pawns[0] ? 'x' : 'o';
+    }
 
     public Board() {
         this.boardGrid = new char[][]{
                 {'o', ' ', 'o', ' ', 'o', ' ', 'o', ' '},
                 {' ', 'o', ' ', 'o', ' ', 'o', ' ', 'o'},
                 {'o', ' ', 'o', ' ', 'o', ' ', 'o', ' '},
-                {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+                {' ', 'x', ' ', ' ', ' ', ' ', ' ', ' '},
                 {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
                 {'x', ' ', 'x', ' ', 'x', ' ', 'x', ' '},
                 {' ', 'x', ' ', 'x', ' ', 'x', ' ', 'x'},
@@ -52,18 +54,21 @@ public class Board {
     }
 
 
-    public void updateBoard(String move) {
-        if (validateInput(move)) {
-            int[] coordinates = convertMove(move);
-            System.out.println("halo");
-            System.out.println(Arrays.toString(coordinates));
+    public void updateBoard(int[] selectedCoordinates, int[] moveCoordinates, char playerPawn) {
+        int[] moveDirections = getMoveDirections(selectedCoordinates, moveCoordinates);
+
+        boardGrid[selectedCoordinates[0]][selectedCoordinates[1]] = ' ';
+
+        if (boardGrid[moveCoordinates[0]][moveCoordinates[1]] == ' ') {
+            boardGrid[moveCoordinates[0]][moveCoordinates[1]] = playerPawn;
         } else {
-            System.out.println("Error");
+            boardGrid[moveCoordinates[0]][moveCoordinates[1]] = ' ';
+            boardGrid[moveCoordinates[0] + moveDirections[0]][moveCoordinates[1] + moveDirections[1]] = playerPawn;
         }
     }
 
     static public boolean checkIfInBoardDimentions(int[] coordinates) {
-        return (coordinates[0] >= 0 && coordinates[0] <= 8 && coordinates[1] >= 0 && coordinates[1] <= 8);
+        return (coordinates[0] >= 0 && coordinates[0] < 8 && coordinates[1] >= 0 && coordinates[1] < 8);
     }
 
     static public boolean isSelectValid(int[] coordinates, char[][] boardGrid, char playerPawn) {
@@ -76,11 +81,8 @@ public class Board {
     }
 
     static public boolean isMoveValid(int[] moveCoordinates, int[] selectCoordinates, char[][] boardGrid, char playerPawn) {
-        int[] moveDirections = new int[]{
-                (moveCoordinates[0] - selectCoordinates[0]),
-                (moveCoordinates[1] - selectCoordinates[1])
-        };
-        if(!checkIfInBoardDimentions(moveDirections)) return false;
+        int[] moveDirections = getMoveDirections(selectCoordinates, moveCoordinates);
+        if (!checkIfInBoardDimentions(moveCoordinates)) return false;
         if (Math.abs(moveDirections[0]) != 1 || Math.abs(moveDirections[1]) != 1) return false;
         if (boardGrid[moveCoordinates[0]][moveCoordinates[1]] == playerPawn) return false;
         if (boardGrid[moveCoordinates[0]][moveCoordinates[1]] != ' ') {
@@ -89,11 +91,19 @@ public class Board {
                     (moveCoordinates[1] + moveDirections[1])
             };
 
-            if (checkIfInBoardDimentions(newCoordinates)) return false;
+            if (!checkIfInBoardDimentions(newCoordinates)) return false;
             if (boardGrid[newCoordinates[0]][newCoordinates[1]] != ' ') return false;
 
         }
 
         return true;
     }
+
+    static int[] getMoveDirections(int[] selectCoordinates, int[] moveCoordinates) {
+        return new int[]{
+                (moveCoordinates[0] - selectCoordinates[0]),
+                (moveCoordinates[1] - selectCoordinates[1])
+        };
+    }
+
 }
