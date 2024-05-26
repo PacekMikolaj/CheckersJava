@@ -26,17 +26,6 @@ public class BoardView {
 
         }
 
-//        return """
-//                  1   2   3   4   5   6   7   8
-//              A | o |   | o |   | o |   | o |   |
-//              B |   | o |   | o |   | o |   | o |
-//              C | o |   | o |   | o |   | o |   |
-//              D |   |   |   |   |   |   |   |   |
-//              E |   |   |   |   |   |   |   |   |
-//              F | x |   | x |   | x |   | x |   |
-//              G |   | x |   | x |   | x |   | x |
-//              H | x |   | x |   | x |   | x |   |
-//              """;
         return returnedBoard.toString();
     }
 

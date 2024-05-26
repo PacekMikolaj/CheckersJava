@@ -2,10 +2,8 @@ package server.model;
 
 public class Board {
     public char[][] boardGrid = new char[8][8];
-    public static final char[] pawns = new char[]{'o', 'x'};
-
     public static char getOponnentsPawn(char pawn) {
-        return pawn == pawns[0] ? 'x' : 'o';
+        return pawn == Constants.pawns[0] ? 'x' : 'o';
     }
 
     public Board() {
