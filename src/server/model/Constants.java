@@ -2,7 +2,7 @@ package server.model;
 
 public class Constants {
     public static final char[] arrayOfLetters = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
-    public static final int[][] listOfMoves = {{1,1},{1,-1},{-1,1},{-1,-1}};
+    public static final int[][] listOfMoves = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
     public static final char[] pawns = new char[]{'o', 'x'};
 
 

@@ -34,7 +34,7 @@ public class PlayerInteractions {
         }
         moveCoordinates = Board.convertMove(input);
 
-        if (!Board.isMoveValid(moveCoordinates, selectCoordinates, board.boardGrid, 'o')) {
+        if (!Board.isMoveValid(moveCoordinates, selectCoordinates, board.boardGrid, playerPawn)) {
             sendMessage.accept("Invalid input. Try again.");
 
             return new int[]{};

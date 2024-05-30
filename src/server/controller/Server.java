@@ -21,7 +21,7 @@ public class Server extends WebSocketServer {
     public int playerTurn = 0;
 
     private int[] selectedCoordinates = {};
-    private int[] moveCoordinates;
+    private int[] moveCoordinates = {};
 
     public static final int SERVER_PORT = 8080;
 
@@ -43,21 +43,21 @@ public class Server extends WebSocketServer {
             var resource = webSocket.getResourceDescriptor();
             String name = resource.split("=")[1];
             webSocket.send("Your Pawn is: %s".formatted(players.isEmpty() ? 'o' : 'x'));
-            players.add(new Player( players.isEmpty() ? 'o' : 'x',name, webSocket));
+            players.add(new Player(players.isEmpty() ? 'o' : 'x', name, webSocket));
             System.out.println(this.getConnections().toString());
             System.out.println("Connection opened: " + webSocket.getRemoteSocketAddress());
             broadcastAllButSender(webSocket, "%s has joined the chat %s.".formatted(name, webSocket.getRemoteSocketAddress().toString()));
         } else {
             System.out.println("Connection attempt rejected: " + webSocket.getRemoteSocketAddress());
             webSocket.send("Connection rejected. Session already has 2 players.");
-            webSocket.close(); // Close the connection if there are already two active connections
+            webSocket.close();
         }
 
         if (players.size() == 2) {
             broadcast("Welcome to Checkers.");
             broadcast(boardView.toString());
             System.out.println(players.toString());
-            players.get(playerTurn%2).webSocket.send("Select your pawn :) ...");
+            players.get(playerTurn % 2).webSocket.send("Select your pawn :) ...");
 
         }
     }
@@ -79,7 +79,7 @@ public class Server extends WebSocketServer {
             webSocket.send("Waiting for another user to connect...");
         } else {
 
-            if (Constants.pawns[playerTurn%2] == player.pawn) {
+            if (Constants.pawns[playerTurn % 2] == player.pawn) {
                 System.out.println(move);
                 if (selectedCoordinates.length == 0) {
                     selectedCoordinates = PlayerInteractions.selectPawn(board, player.pawn, move, sendMessage);
@@ -95,8 +95,15 @@ public class Server extends WebSocketServer {
                     }
 
                     board.updateBoard(selectedCoordinates, moveCoordinates, player.pawn);
-                    broadcast(boardView.toString());
-                    players.get(playerTurn%2).webSocket.send("Select your pawn :) ...");
+
+                    if (Board.checkIfGameEnds(player, board.boardGrid)) {
+                        broadcast("The Game Ends! The Winner: %s".formatted(player.name));
+                    } else {
+                        selectedCoordinates = new int[0];
+                        moveCoordinates = new int[0];
+                        broadcast(boardView.toString());
+                        players.get(playerTurn % 2).webSocket.send("Select pawn to move...");
+                    }
                 }
             } else {
                 webSocket.send("Wait for your turn :)");

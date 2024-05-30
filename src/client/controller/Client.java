@@ -29,9 +29,9 @@ public class Client {
                 }
         ).join();
 
-        while(true){
+        while (true) {
             String input = scanner.nextLine();
-            if ("bye".equalsIgnoreCase(input)){
+            if ("bye".equalsIgnoreCase(input)) {
                 try {
                     webSocket.sendClose(WebSocket.NORMAL_CLOSURE, "User left normally").get();
                 } catch (ExecutionException | InterruptedException e) {

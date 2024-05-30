@@ -1,21 +1,18 @@
 package server.model;
 
 public class Board {
-    public char[][] boardGrid = new char[8][8];
-    public static char getOponnentsPawn(char pawn) {
-        return pawn == Constants.pawns[0] ? 'x' : 'o';
-    }
+    public char[][] boardGrid;
 
     public Board() {
         this.boardGrid = new char[][]{
                 {'o', ' ', 'o', ' ', 'o', ' ', 'o', ' '},
                 {' ', 'o', ' ', 'o', ' ', 'o', ' ', 'o'},
                 {'o', ' ', 'o', ' ', 'o', ' ', 'o', ' '},
-                {' ', 'x', ' ', ' ', ' ', ' ', ' ', ' '},
                 {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-                {'x', ' ', 'x', ' ', 'x', ' ', 'x', ' '},
+                {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
                 {' ', 'x', ' ', 'x', ' ', 'x', ' ', 'x'},
-                {'x', ' ', 'x', ' ', 'x', ' ', 'x', ' '}
+                {'x', ' ', 'x', ' ', 'x', ' ', 'x', ' '},
+                {' ', 'x', ' ', 'x', ' ', 'x', ' ', 'x'}
         };
     }
 
@@ -80,8 +77,11 @@ public class Board {
 
     static public boolean isMoveValid(int[] moveCoordinates, int[] selectCoordinates, char[][] boardGrid, char playerPawn) {
         int[] moveDirections = getMoveDirections(selectCoordinates, moveCoordinates);
+        int validDirection = Constants.pawns[0] == playerPawn ? 1 : -1;
+
         if (!checkIfInBoardDimentions(moveCoordinates)) return false;
         if (Math.abs(moveDirections[0]) != 1 || Math.abs(moveDirections[1]) != 1) return false;
+        if (moveDirections[0] != validDirection) return false;
         if (boardGrid[moveCoordinates[0]][moveCoordinates[1]] == playerPawn) return false;
         if (boardGrid[moveCoordinates[0]][moveCoordinates[1]] != ' ') {
             int[] newCoordinates = new int[]{
@@ -102,6 +102,16 @@ public class Board {
                 (moveCoordinates[0] - selectCoordinates[0]),
                 (moveCoordinates[1] - selectCoordinates[1])
         };
+    }
+
+    public static boolean checkIfGameEnds(Player player, char[][] boardGrid) {
+        int finishLine = player.pawn == Constants.pawns[0] ? 7 : 0;
+        for (int i = 0; i < boardGrid.length; i++) {
+            if (boardGrid[finishLine][i] == player.pawn) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

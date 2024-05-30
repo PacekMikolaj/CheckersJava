@@ -25,10 +25,8 @@ public class BoardView {
             returnedBoard.append("\n");
 
         }
-
         return returnedBoard.toString();
     }
 
     ;
-
 };
